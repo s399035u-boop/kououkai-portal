@@ -131,9 +131,12 @@ label.f { display: block; font-size: 13px; color: var(--sub); margin: 10px 0 4px
 .chip.event { background: #e6f3ec; color: var(--ok); }
 .chip.bday  { background: var(--accent-soft); color: var(--accent); }
 .cal .more { font-size: 10px; color: var(--sub); }
+.chip .sm { display: none; }
 @media (max-width: 720px) {
   .cal .d { min-height: 64px; padding: 2px; }
   .chip { font-size: 9px; padding: 0 2px; }
+  .chip .lg { display: none; }
+  .chip .sm { display: inline; }
   .cal .hn { display: none; }
 }
 
@@ -550,19 +553,22 @@ async function drawCal() {
     const cls = ['d', d.getDay() === 0 ? 'sun' : d.getDay() === 6 ? 'sat' : '', holidays[iso] ? 'hol' : '', iso === today ? 'today' : ''].join(' ');
     cells.push(`<div class="${cls}" onclick="showDay('${iso}')">
       <span class="num">${d.getDate()}</span>${holidays[iso] ? `<span class="hn">${esc(holidays[iso])}</span>` : ''}
-      ${chips.slice(0, 4).map(c => `<span class="chip ${c.cls}">${esc(c.text)}</span>`).join('')}
+      ${chips.slice(0, 4).map(c => `<span class="chip ${c.cls}"><span class="lg">${esc(c.text)}</span><span class="sm">${esc(c.short || c.text)}</span></span>`).join('')}
       ${chips.length > 4 ? `<span class="more">他${chips.length - 4}件</span>` : ''}</div>`);
   }
   $('cal').innerHTML = cells.join('');
 }
 
+// スマホのマス目用に苗字だけ（「岡本　のぞみ」→「岡本」）
+const surname = n => String(n).split(/[\s　]+/)[0];
+
 function dayItems(iso) {
   const d = +iso.slice(8, 10);
   return [
-    ...calData.bdays.filter(p => p.birth_day === d).map(p => ({ cls: 'bday', text: '🎂 ' + p.full_name })),
+    ...calData.bdays.filter(p => p.birth_day === d).map(p => ({ cls: 'bday', text: '🎂 ' + p.full_name, short: '🎂 ' + surname(p.full_name) })),
     ...calData.events.filter(e => e.event_date === iso).map(e => ({ cls: 'event', text: e.title })),
     ...calData.leaves.filter(r => r.start_date <= iso && r.end_date >= iso)
-      .map(r => ({ cls: 'leave', text: `${nameOf(r.user_id)} ${leaveText(r)}` })),
+      .map(r => ({ cls: 'leave', text: `${nameOf(r.user_id)} ${leaveText(r)}`, short: `${surname(nameOf(r.user_id))} ${leaveText(r)}` })),
   ];
 }
 
