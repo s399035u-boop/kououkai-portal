@@ -112,6 +112,31 @@ label.f { display: block; font-size: 13px; color: var(--sub); margin: 10px 0 4px
 .cat-h { font-size: 13px; color: var(--sub); font-weight: 600; margin: 18px 0 8px; letter-spacing: .05em; }
 .cat-h:first-child { margin-top: 0; }
 
+/* ---------- カレンダー（閲覧のみ） ---------- */
+.cal-head { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+.cal-head h2 { margin: 0; flex: 1; }
+.cal { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); border-top: 1px solid var(--line); border-left: 1px solid var(--line); }
+.cal > div { border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); min-width: 0; }
+.cal .wd { text-align: center; font-size: 12px; color: var(--sub); padding: 2px 0; background: #faf9f7; }
+.cal .wd.sun, .cal .d.sun .num, .cal .d.hol .num { color: var(--warn); }
+.cal .wd.sat, .cal .d.sat .num { color: #2f62b0; }
+.cal .d { min-height: 92px; padding: 3px 4px; cursor: pointer; overflow: hidden; }
+.cal .d:hover { background: #faf9f7; }
+.cal .d.out { background: #fbfbfa; cursor: default; }
+.cal .d.today { background: #fff8e8; }
+.cal .num { font-size: 12px; font-weight: 600; }
+.cal .hn { font-size: 10px; color: var(--warn); margin-left: 3px; font-weight: 400; }
+.chip { display: block; font-size: 11px; line-height: 1.5; padding: 0 4px; margin-top: 2px; border-radius: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.chip.leave { background: #eef0f4; color: var(--navy); }
+.chip.event { background: #e6f3ec; color: var(--ok); }
+.chip.bday  { background: var(--accent-soft); color: var(--accent); }
+.cal .more { font-size: 10px; color: var(--sub); }
+@media (max-width: 720px) {
+  .cal .d { min-height: 64px; padding: 2px; }
+  .chip { font-size: 9px; padding: 0 2px; }
+  .cal .hn { display: none; }
+}
+
 /* ---------- 本文 ---------- */
 .body { overflow-wrap: anywhere; }
 .body h2 { font-size: 17px; margin: 18px 0 6px; padding-bottom: 4px; border-bottom: 1px solid var(--line); }
@@ -421,12 +446,11 @@ function leaveText(r) {
 }
 
 async function viewHome() {
-  const t = ymd(new Date()), t1 = addDays(t, 1), w = addDays(t, 13);
-  const [posts, reads, leaves, events, pages, links] = await Promise.all([
+  const t = ymd(new Date()), t1 = addDays(t, 1);
+  const [posts, reads, leaves, pages, links] = await Promise.all([
     GET('portal_posts', 'select=id,title,category,pinned,author_id,created_at&order=pinned.desc,created_at.desc&limit=8'),
     GET('portal_reads', 'select=post_id&user_id=eq.' + me.id),
     GET('leave_requests', `select=user_id,start_date,end_date,leave_type,half_period,start_time,end_time,kind&status=eq.approved&start_date=lte.${t1}&end_date=gte.${t}`),
-    GET('events', `select=title,event_date&event_date=gte.${t}&event_date=lte.${w}&order=event_date`),
     GET('portal_pages', 'select=id,title,category,updated_at,updated_by&order=updated_at.desc&limit=5'),
     GET('portal_links', 'select=*&order=sort,created_at&limit=6'),
   ]);
@@ -444,16 +468,21 @@ async function viewHome() {
         <div class="toolbar"><h2 class="grow" style="margin:0">📢 お知らせ</h2><a class="btn sm" href="#posts">すべて見る</a></div>
         <ul class="list">${posts.map(p => postRow(p, readSet)).join('') || '<li class="empty">まだお知らせはありません</li>'}</ul>
       </section>
+      <section class="card" style="grid-column:1/-1">
+        <div class="cal-head">
+          <h2 id="cal-title"></h2>
+          <button class="btn sm" onclick="moveCal(-1)" aria-label="前の月">‹</button>
+          <button class="btn sm" onclick="moveCal(0)">今月</button>
+          <button class="btn sm" onclick="moveCal(1)" aria-label="次の月">›</button>
+        </div>
+        <div class="cal" id="cal"></div>
+        <p class="muted" style="margin:8px 0 0">日付をタップすると詳細を表示。予定・休みの登録は<a href="https://s399035u-boop.github.io/yukyu-kanri/" target="_blank" rel="noopener">有給管理</a>から</p>
+      </section>
       <section class="card">
         <h2>🗓 今日のお休み <span class="muted">${fmtDay(t)}</span></h2>
         <ul class="list">${offOn(t)}</ul>
         <h2 style="margin-top:14px">明日のお休み <span class="muted">${fmtDay(t1)}</span></h2>
         <ul class="list">${offOn(t1)}</ul>
-      </section>
-      <section class="card">
-        <h2>📌 2週間の予定</h2>
-        <ul class="list">${events.map(e => `<li class="row" style="cursor:default"><span class="muted" style="width:72px;flex:none">${fmtDay(e.event_date)}</span><div class="main">${esc(e.title)}</div></li>`).join('') || '<li class="empty">予定はありません</li>'}</ul>
-        <p class="muted" style="margin:8px 0 0">予定の追加は<a href="https://s399035u-boop.github.io/yukyu-kanri/" target="_blank" rel="noopener">有給管理</a>のカレンダーから</p>
       </section>
       <section class="card">
         <div class="toolbar"><h2 class="grow" style="margin:0">📘 最近更新されたマニュアル</h2></div>
@@ -464,6 +493,85 @@ async function viewHome() {
         <div class="links" style="grid-template-columns:1fr">${links.map(l => `<a class="lk" href="${esc(l.url)}" target="_blank" rel="noopener"><b>${esc(l.title)}</b><span>${esc(l.description || '')}</span></a>`).join('')}</div>
       </section>
     </div>`;
+  drawCal();
+}
+
+// ================================================================
+//  月カレンダー（有給管理のデータを読むだけ・書き込みなし）
+// ================================================================
+let calMonth = null;   // その月の1日（Date）
+let calData = { leaves: [], events: [], bdays: [] };
+let holidays = {};
+
+async function loadHolidays() {
+  if (Object.keys(holidays).length) return;
+  try { holidays = JSON.parse(localStorage.getItem('portal_holidays') || '{}'); } catch {}
+  try {
+    const res = await fetch('https://holidays-jp.github.io/api/v1/date.json');
+    if (res.ok) {
+      holidays = await res.json();
+      try { localStorage.setItem('portal_holidays', JSON.stringify(holidays)); } catch {}
+    }
+  } catch {}
+}
+
+function moveCal(n) {
+  const now = new Date();
+  calMonth = n === 0 ? new Date(now.getFullYear(), now.getMonth(), 1)
+                     : new Date(calMonth.getFullYear(), calMonth.getMonth() + n, 1);
+  drawCal();
+}
+
+async function drawCal() {
+  if (!calMonth) { const n = new Date(); calMonth = new Date(n.getFullYear(), n.getMonth(), 1); }
+  const y = calMonth.getFullYear(), m = calMonth.getMonth();
+  const first = ymd(calMonth), last = ymd(new Date(y, m + 1, 0));
+  $('cal-title').textContent = `🗓 ${y}年${m + 1}月`;
+  try {
+    const [leaves, events, bdays] = await Promise.all([
+      GET('leave_requests', `select=user_id,start_date,end_date,leave_type,half_period,start_time,end_time,kind&status=eq.approved&start_date=lte.${last}&end_date=gte.${first}`),
+      GET('events', `select=title,event_date&event_date=gte.${first}&event_date=lte.${last}&order=created_at`),
+      GET('profiles', `select=full_name,birth_day&birth_month=eq.${m + 1}&birth_day=not.is.null&active=is.true&role=neq.viewer`),
+      loadHolidays(),
+    ]);
+    calData = { leaves, events, bdays };
+  } catch (e) { calData = { leaves: [], events: [], bdays: [] }; }
+  if (!$('cal') || calMonth.getFullYear() !== y || calMonth.getMonth() !== m) return;   // 別画面・別月に移動済み
+
+  const today = ymd(new Date());
+  const cells = WD.map((w, i) => `<div class="wd ${i === 0 ? 'sun' : i === 6 ? 'sat' : ''}">${w}</div>`);
+  const start = new Date(y, m, 1 - calMonth.getDay());
+  for (let i = 0; i < 42; i++) {
+    const d = new Date(start); d.setDate(start.getDate() + i);
+    if (i >= 35 && d.getMonth() !== m) break;   // 5週で収まる月は6週目を出さない
+    const iso = ymd(d), inMonth = d.getMonth() === m;
+    if (!inMonth) { cells.push(`<div class="d out"></div>`); continue; }
+    const chips = dayItems(iso);
+    const cls = ['d', d.getDay() === 0 ? 'sun' : d.getDay() === 6 ? 'sat' : '', holidays[iso] ? 'hol' : '', iso === today ? 'today' : ''].join(' ');
+    cells.push(`<div class="${cls}" onclick="showDay('${iso}')">
+      <span class="num">${d.getDate()}</span>${holidays[iso] ? `<span class="hn">${esc(holidays[iso])}</span>` : ''}
+      ${chips.slice(0, 4).map(c => `<span class="chip ${c.cls}">${esc(c.text)}</span>`).join('')}
+      ${chips.length > 4 ? `<span class="more">他${chips.length - 4}件</span>` : ''}</div>`);
+  }
+  $('cal').innerHTML = cells.join('');
+}
+
+function dayItems(iso) {
+  const d = +iso.slice(8, 10);
+  return [
+    ...calData.bdays.filter(p => p.birth_day === d).map(p => ({ cls: 'bday', text: '🎂 ' + p.full_name })),
+    ...calData.events.filter(e => e.event_date === iso).map(e => ({ cls: 'event', text: e.title })),
+    ...calData.leaves.filter(r => r.start_date <= iso && r.end_date >= iso)
+      .map(r => ({ cls: 'leave', text: `${nameOf(r.user_id)} ${leaveText(r)}` })),
+  ];
+}
+
+function showDay(iso) {
+  const items = dayItems(iso);
+  openModal(`
+    <h1>${fmtDay(iso)}${holidays[iso] ? ` <span class="muted">${esc(holidays[iso])}</span>` : ''}</h1>
+    ${items.length ? items.map(c => `<span class="chip ${c.cls}" style="font-size:14px;padding:4px 10px;margin-top:6px;white-space:normal">${esc(c.text)}</span>`).join('')
+                   : '<p class="empty">予定・お休みはありません</p>'}`);
 }
 function greeting() {
   const h = new Date().getHours();
