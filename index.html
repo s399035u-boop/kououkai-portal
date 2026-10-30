@@ -1,0 +1,847 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>煌桜会ポータル</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌸</text></svg>">
+<style>
+:root {
+  --bg: #f6f5f3; --card: #ffffff; --ink: #1f2430; --sub: #6b7080; --line: #e4e2de;
+  --navy: #22304a; --accent: #c2577a; --accent-soft: #fbeef3; --ok: #2f8a5b; --warn: #c0392b;
+  --radius: 12px;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  background: var(--bg); color: var(--ink);
+  font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif;
+  font-size: 15px; line-height: 1.7; -webkit-text-size-adjust: 100%;
+}
+a { color: var(--navy); }
+button { font: inherit; cursor: pointer; }
+input, select, textarea { font: inherit; color: inherit; }
+.hidden { display: none !important; }
+
+/* ---------- ヘッダー・ナビ ---------- */
+header {
+  position: sticky; top: 0; z-index: 20; background: var(--navy); color: #fff;
+  padding: 0 16px; padding-top: env(safe-area-inset-top);
+}
+.hd-in { max-width: 1040px; margin: 0 auto; display: flex; align-items: center; gap: 16px; height: 56px; }
+.brand { font-weight: 700; letter-spacing: .04em; white-space: nowrap; }
+.brand small { font-weight: 400; opacity: .7; margin-left: 6px; font-size: 12px; }
+nav.top { display: flex; gap: 4px; flex: 1; }
+nav a {
+  color: #fff; text-decoration: none; padding: 6px 12px; border-radius: 8px; opacity: .78; white-space: nowrap;
+  position: relative;
+}
+nav a.on { opacity: 1; background: rgba(255,255,255,.14); }
+.me { font-size: 13px; opacity: .85; white-space: nowrap; }
+.me button { background: none; border: 1px solid rgba(255,255,255,.4); color: #fff; border-radius: 6px; padding: 2px 8px; margin-left: 8px; font-size: 12px; }
+.dot { display: inline-block; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; background: var(--accent); color: #fff; font-size: 11px; line-height: 18px; text-align: center; margin-left: 4px; vertical-align: 1px; }
+
+nav.bottom { display: none; }
+@media (max-width: 720px) {
+  nav.top, .me .who { display: none; }
+  .hd-in { justify-content: space-between; }
+  nav.bottom {
+    display: flex; position: fixed; left: 0; right: 0; bottom: 0; z-index: 20;
+    background: var(--card); border-top: 1px solid var(--line);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  nav.bottom a { flex: 1; color: var(--sub); text-align: center; font-size: 11px; padding: 6px 0 4px; opacity: 1; border-radius: 0; }
+  nav.bottom a .ic { display: block; font-size: 20px; line-height: 1.3; }
+  nav.bottom a.on { color: var(--accent); background: none; }
+  nav.bottom .dot { position: absolute; top: 2px; left: 55%; margin: 0; }
+  main { padding-bottom: 90px !important; }
+}
+
+/* ---------- レイアウト ---------- */
+main { max-width: 1040px; margin: 0 auto; padding: 20px 16px 48px; }
+h1 { font-size: 22px; margin: 4px 0 16px; }
+h2 { font-size: 17px; margin: 0 0 10px; }
+.toolbar { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 14px; }
+.toolbar .grow { flex: 1; }
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px; min-width: 0; }
+.muted { color: var(--sub); font-size: 13px; }
+.empty { color: var(--sub); font-size: 14px; padding: 8px 0; }
+.notice { background: var(--accent-soft); border-radius: 10px; padding: 10px 14px; font-size: 13px; margin-bottom: 16px; }
+
+.btn { border: 1px solid var(--line); background: var(--card); border-radius: 8px; padding: 7px 14px; }
+.btn.primary { background: var(--navy); border-color: var(--navy); color: #fff; }
+.btn.accent { background: var(--accent); border-color: var(--accent); color: #fff; }
+.btn.danger { color: var(--warn); border-color: #efc7c2; }
+.btn.sm { padding: 3px 10px; font-size: 13px; }
+.btn:disabled { opacity: .5; cursor: default; }
+input[type=text], input[type=email], input[type=password], input[type=url], input[type=search], select, textarea {
+  width: 100%; border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; background: #fff;
+}
+textarea { min-height: 220px; resize: vertical; line-height: 1.6; }
+label.f { display: block; font-size: 13px; color: var(--sub); margin: 10px 0 4px; }
+.toolbar input[type=search] { max-width: 260px; }
+.toolbar select { width: auto; }
+
+/* ---------- リスト ---------- */
+.list { list-style: none; margin: 0; padding: 0; }
+.list li { border-top: 1px solid var(--line); }
+.list li:first-child { border-top: none; }
+.row { display: flex; gap: 10px; align-items: flex-start; padding: 10px 2px; text-decoration: none; color: inherit; cursor: pointer; }
+.row:hover { background: #faf9f7; }
+.row .main { flex: 1; min-width: 0; }
+.row .ttl { font-weight: 600; overflow-wrap: anywhere; }
+.row.unread .ttl::before { content: ''; display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); margin-right: 8px; vertical-align: 2px; }
+.tag { display: inline-block; font-size: 11px; padding: 0 8px; border-radius: 10px; background: #eef0f4; color: var(--navy); white-space: nowrap; line-height: 20px; }
+.tag.重要 { background: #fde8e5; color: var(--warn); }
+.tag.研修 { background: #e6f3ec; color: var(--ok); }
+.tag.行事 { background: var(--accent-soft); color: var(--accent); }
+.pin { color: var(--accent); font-size: 13px; }
+
+.links { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; }
+.lk { display: block; background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; text-decoration: none; color: inherit; position: relative; }
+.lk:hover { border-color: var(--navy); }
+.lk b { display: block; color: var(--navy); }
+.lk span { font-size: 12px; color: var(--sub); }
+.lk .ops { position: absolute; top: 6px; right: 6px; display: none; gap: 4px; }
+.lk:hover .ops { display: flex; }
+@media (hover: none) { .lk .ops { display: flex; } }
+.lk .ops button { border: none; background: #f0eeea; border-radius: 6px; font-size: 11px; padding: 1px 6px; }
+
+.cat-h { font-size: 13px; color: var(--sub); font-weight: 600; margin: 18px 0 8px; letter-spacing: .05em; }
+.cat-h:first-child { margin-top: 0; }
+
+/* ---------- 本文 ---------- */
+.body { overflow-wrap: anywhere; }
+.body h2 { font-size: 17px; margin: 18px 0 6px; padding-bottom: 4px; border-bottom: 1px solid var(--line); }
+.body h3 { font-size: 15px; margin: 14px 0 4px; }
+.body p { margin: 0 0 8px; }
+.body ul { margin: 0 0 8px; padding-left: 1.4em; }
+
+/* ---------- モーダル ---------- */
+.modal { position: fixed; inset: 0; z-index: 50; background: rgba(20,24,34,.45); display: flex; align-items: flex-start; justify-content: center; padding: 40px 16px; overflow-y: auto; }
+.modal .card { width: 100%; max-width: 720px; padding: 20px; }
+.modal .close { float: right; border: none; background: none; font-size: 22px; line-height: 1; color: var(--sub); }
+.modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 16px; flex-wrap: wrap; }
+.readers { font-size: 13px; color: var(--sub); }
+.comment { border-top: 1px solid var(--line); padding: 8px 0; font-size: 14px; }
+
+/* ---------- ログイン ---------- */
+#view-login { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 16px; background: var(--navy); }
+#view-login .card { width: 100%; max-width: 380px; padding: 28px 24px; }
+#view-login h1 { text-align: center; margin-bottom: 4px; }
+.alert { color: var(--warn); font-size: 13px; min-height: 20px; margin-top: 8px; }
+.toast { position: fixed; left: 50%; bottom: 90px; transform: translateX(-50%); background: var(--navy); color: #fff; padding: 8px 16px; border-radius: 8px; font-size: 14px; z-index: 60; }
+</style>
+</head>
+<body>
+
+<!-- ================= ログイン ================= -->
+<div id="view-login" class="hidden">
+  <form class="card" onsubmit="doLogin(event)">
+    <h1>🌸 煌桜会ポータル</h1>
+    <p class="muted" style="text-align:center;margin:0 0 16px">有給管理と同じアカウントでログインできます</p>
+    <label class="f">メールアドレス</label>
+    <input type="email" id="login-email" autocomplete="username" required>
+    <label class="f">パスワード</label>
+    <input type="password" id="login-password" autocomplete="current-password" required>
+    <button class="btn primary" style="width:100%;margin-top:18px;padding:10px">ログイン</button>
+    <div class="alert" id="login-alert"></div>
+  </form>
+</div>
+
+<!-- ================= アプリ本体 ================= -->
+<div id="view-app" class="hidden">
+  <header>
+    <div class="hd-in">
+      <div class="brand">🌸 煌桜会<small>ポータル</small></div>
+      <nav class="top" id="nav-top"></nav>
+      <div class="me"><span class="who" id="me-name"></span><button onclick="doLogout()">ログアウト</button></div>
+    </div>
+  </header>
+  <main id="main"></main>
+  <nav class="bottom" id="nav-bottom"></nav>
+</div>
+
+<div id="modal-root"></div>
+
+<script>
+// ================================================================
+//  設定（有給管理と同じ Supabase プロジェクト）
+// ================================================================
+const SUPABASE_URL  = 'https://usdgadreruepqphqlcno.supabase.co';
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVzZGdhZHJlcnVlcHFwaHFsY25vIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI4MzIyNDAsImV4cCI6MjA5ODQwODI0MH0.FRqyp1b2Jg5Fcf70b9nRNaPtnyPmXFNYaPyNhqqRGD4';
+const BUCKET = 'portal-files';
+
+const POST_CATS = ['重要', '連絡', '研修', '行事', 'その他'];
+const PAGE_CATS = ['はじめに', '勤怠・休暇', '診療', '受付・会計', '医療安全', '感染対策', '設備・備品', 'IT・システム', '会議・議事録', 'その他'];
+const FILE_CATS = ['書式・様式', '研修資料', '会議資料', '掲示物', 'その他'];
+const LINK_CATS = ['院内アプリ', '業務システム', '外部サイト', 'その他'];
+
+const TABS = [
+  { id: 'home',  label: 'ホーム',     ic: '🏠' },
+  { id: 'posts', label: 'お知らせ',   ic: '📢' },
+  { id: 'pages', label: 'マニュアル', ic: '📘' },
+  { id: 'files', label: 'ファイル',   ic: '📁' },
+  { id: 'links', label: 'リンク',     ic: '🔗' },
+];
+
+// ================================================================
+//  セッション（有給管理と同じキー＝同じブラウザならログイン共有）
+// ================================================================
+let _sess = null;
+function getSession() {
+  if (_sess) return _sess;
+  try { _sess = JSON.parse(localStorage.getItem('ykg_sess')); } catch {}
+  return _sess;
+}
+function saveSession(s) {
+  _sess = s;
+  try {
+    if (s) localStorage.setItem('ykg_sess', JSON.stringify(s));
+    else   localStorage.removeItem('ykg_sess');
+  } catch {}
+}
+function authH() {
+  const s = getSession();
+  const h = { 'apikey': SUPABASE_ANON };
+  if (s?.access_token) h['Authorization'] = 'Bearer ' + s.access_token;
+  return h;
+}
+
+let _refreshing = null;
+async function refreshToken() {
+  if (_refreshing) return _refreshing;
+  const s = getSession();
+  if (!s?.refresh_token) return null;
+  _refreshing = (async () => {
+    try {
+      const res = await fetch(SUPABASE_URL + '/auth/v1/token?grant_type=refresh_token', {
+        method: 'POST',
+        headers: { 'apikey': SUPABASE_ANON, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ refresh_token: s.refresh_token }),
+      });
+      const data = await res.json();
+      if (!res.ok) return null;
+      saveSession(data);
+      return data;
+    } catch { return null; }
+    finally { _refreshing = null; }
+  })();
+  return _refreshing;
+}
+
+// 401 のときだけトークンを更新して1回再試行
+async function api(url, opts = {}, _retried) {
+  const res = await fetch(url, { cache: 'no-store', ...opts, headers: { ...authH(), ...(opts.headers || {}) } });
+  if (res.status === 401 && !_retried && await refreshToken()) return api(url, opts, true);
+  return res;
+}
+
+// ================================================================
+//  DB ヘルパー（Supabase REST）
+// ================================================================
+async function db(method, table, qs, body, prefer) {
+  const headers = { 'Content-Type': 'application/json', 'Accept': 'application/json' };
+  if (prefer) headers['Prefer'] = prefer;
+  const res = await api(SUPABASE_URL + '/rest/v1/' + table + (qs ? '?' + qs : ''), {
+    method, headers, body: body != null ? JSON.stringify(body) : undefined,
+  });
+  const text = await res.text();
+  let data = null;
+  try { data = text ? JSON.parse(text) : null; } catch {}
+  if (!res.ok) throw new Error(data?.message || ('HTTP ' + res.status));
+  return data;
+}
+const GET   = (t, q)    => db('GET', t, q);
+const POST  = (t, b)    => db('POST', t, '', b, 'return=representation');
+const PATCH = (t, q, b) => db('PATCH', t, q, b, 'return=representation');
+const DEL   = (t, q)    => db('DELETE', t, q);
+
+// ================================================================
+//  状態・ユーティリティ
+// ================================================================
+let me = null;              // 自分の profiles 行
+let people = {};            // id → profiles
+const isAdmin = () => me?.role === 'admin';
+
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const nameOf = id => people[id]?.full_name || '（退職者）';
+const $ = id => document.getElementById(id);
+
+function ymd(d) {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+function addDays(s, n) { const d = new Date(s + 'T00:00:00'); d.setDate(d.getDate() + n); return ymd(d); }
+const WD = ['日', '月', '火', '水', '木', '金', '土'];
+function fmtDay(s) { const d = new Date(s.slice(0, 10) + 'T00:00:00'); return `${d.getMonth() + 1}/${d.getDate()}(${WD[d.getDay()]})`; }
+function fmtTime(ts) {
+  const d = new Date(ts);
+  const sameYear = d.getFullYear() === new Date().getFullYear();
+  return (sameYear ? '' : d.getFullYear() + '/') + `${d.getMonth() + 1}/${d.getDate()} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+}
+function fmtSize(n) {
+  if (n == null) return '';
+  if (n < 1024) return n + ' B';
+  if (n < 1048576) return (n / 1024).toFixed(0) + ' KB';
+  return (n / 1048576).toFixed(1) + ' MB';
+}
+
+function toast(msg) {
+  const el = document.createElement('div');
+  el.className = 'toast'; el.textContent = msg;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 2200);
+}
+function fail(e) { console.error(e); toast('エラー：' + e.message); }
+
+// 本文の簡易マークダウン（## 見出し / - 箇条書き / **太字** / URL自動リンク）
+function md(src) {
+  const inline = s => esc(s)
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank" rel="noopener">$1</a>');
+  const out = [];
+  let inList = false;
+  for (const line of String(src || '').split('\n')) {
+    const li = line.match(/^\s*[-・]\s+(.*)$/);
+    if (li) { if (!inList) { out.push('<ul>'); inList = true; } out.push('<li>' + inline(li[1]) + '</li>'); continue; }
+    if (inList) { out.push('</ul>'); inList = false; }
+    if (/^###\s+/.test(line))     out.push('<h3>' + inline(line.replace(/^###\s+/, '')) + '</h3>');
+    else if (/^##?\s+/.test(line)) out.push('<h2>' + inline(line.replace(/^##?\s+/, '')) + '</h2>');
+    else if (line.trim())          out.push('<p>' + inline(line) + '</p>');
+  }
+  if (inList) out.push('</ul>');
+  return out.join('');
+}
+
+// ================================================================
+//  モーダル
+// ================================================================
+function openModal(html) {
+  $('modal-root').innerHTML = `<div class="modal" onclick="if(event.target===this)closeModal()"><div class="card"><button class="close" onclick="closeModal()" aria-label="閉じる">×</button>${html}</div></div>`;
+  document.body.style.overflow = 'hidden';
+}
+function closeModal() {
+  $('modal-root').innerHTML = '';
+  document.body.style.overflow = '';
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+// ================================================================
+//  認証
+// ================================================================
+async function doLogin(e) {
+  e.preventDefault();
+  $('login-alert').textContent = '';
+  try {
+    const res = await fetch(SUPABASE_URL + '/auth/v1/token?grant_type=password', {
+      method: 'POST',
+      headers: { 'apikey': SUPABASE_ANON, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: $('login-email').value.trim(), password: $('login-password').value }),
+    });
+    const data = await res.json();
+    if (!res.ok) { $('login-alert').textContent = 'ログインできませんでした。メールアドレスとパスワードを確認してください。'; return; }
+    saveSession(data);
+    await boot();
+  } catch (err) {
+    $('login-alert').textContent = 'ネットワークエラー：' + err.message;
+  }
+}
+
+async function doLogout() {
+  const s = getSession();
+  if (s?.access_token) {
+    await fetch(SUPABASE_URL + '/auth/v1/logout', { method: 'POST', headers: authH() }).catch(() => {});
+  }
+  saveSession(null);
+  me = null;
+  showLogin();
+}
+
+function showLogin(msg) {
+  $('view-app').classList.add('hidden');
+  $('view-login').classList.remove('hidden');
+  $('login-alert').textContent = msg || '';
+}
+
+async function boot() {
+  const s = getSession();
+  if (!s?.access_token) return showLogin();
+  try {
+    const profs = await GET('profiles', 'select=id,full_name,email,role,active&order=full_name');
+    people = Object.fromEntries(profs.map(p => [p.id, p]));
+    me = people[s.user?.id];
+  } catch { me = null; }
+  if (!me) { saveSession(null); return showLogin(); }
+  if (me.role === 'viewer' || !me.active) {
+    saveSession(null);
+    return showLogin('このアカウントではポータルを利用できません。ご自身のアカウントでログインしてください。');
+  }
+  $('view-login').classList.add('hidden');
+  $('view-app').classList.remove('hidden');
+  $('me-name').textContent = me.full_name + ' さん';
+  route();
+}
+
+// ================================================================
+//  ルーティング
+// ================================================================
+let unreadCount = 0;
+function renderNav(cur) {
+  const item = t => `<a href="#${t.id}" class="${t.id === cur ? 'on' : ''}"><span class="ic">${t.ic}</span>${t.label}${t.id === 'posts' && unreadCount ? `<span class="dot">${unreadCount}</span>` : ''}</a>`;
+  $('nav-top').innerHTML = TABS.map(t => item(t).replace(/<span class="ic">.*?<\/span>/, '')).join('');
+  $('nav-bottom').innerHTML = TABS.map(item).join('');
+}
+
+async function route() {
+  if (!me) return;
+  closeModal();
+  const [tab, id] = (location.hash.slice(1) || 'home').split('/');
+  const cur = TABS.some(t => t.id === tab) ? tab : 'home';
+  renderNav(cur);
+  $('main').innerHTML = '<p class="muted">読み込み中…</p>';
+  try {
+    await ({ home: viewHome, posts: viewPosts, pages: viewPages, files: viewFiles, links: viewLinks })[cur](id);
+  } catch (e) {
+    $('main').innerHTML = `<div class="card">読み込みに失敗しました：${esc(e.message)}</div>`;
+  }
+  window.scrollTo(0, 0);
+}
+window.addEventListener('hashchange', route);
+
+// ================================================================
+//  ホーム
+// ================================================================
+const KIND_LABEL = { paid: '有給', birthday: '誕生日休', comp: '代休', bereave: '忌引' };
+function leaveText(r) {
+  if (r.leave_type === 'half') return r.half_period === 'am' ? '午前休' : '午後休';
+  if (r.leave_type === 'hour') return `${(r.start_time || '').slice(0, 5)}〜${(r.end_time || '').slice(0, 5)}`;
+  return KIND_LABEL[r.kind] || '休み';
+}
+
+async function viewHome() {
+  const t = ymd(new Date()), t1 = addDays(t, 1), w = addDays(t, 13);
+  const [posts, reads, leaves, events, pages, links] = await Promise.all([
+    GET('portal_posts', 'select=id,title,category,pinned,author_id,created_at&order=pinned.desc,created_at.desc&limit=8'),
+    GET('portal_reads', 'select=post_id&user_id=eq.' + me.id),
+    GET('leave_requests', `select=user_id,start_date,end_date,leave_type,half_period,start_time,end_time,kind&status=eq.approved&start_date=lte.${t1}&end_date=gte.${t}`),
+    GET('events', `select=title,event_date&event_date=gte.${t}&event_date=lte.${w}&order=event_date`),
+    GET('portal_pages', 'select=id,title,category,updated_at,updated_by&order=updated_at.desc&limit=5'),
+    GET('portal_links', 'select=*&order=sort,created_at&limit=6'),
+  ]);
+  const readSet = new Set(reads.map(r => r.post_id));
+  await refreshUnread();
+
+  const offOn = d => leaves.filter(r => r.start_date <= d && r.end_date >= d)
+    .map(r => `<li class="row" style="cursor:default"><div class="main">${esc(nameOf(r.user_id))}</div><span class="tag">${esc(leaveText(r))}</span></li>`).join('')
+    || '<li class="empty">なし</li>';
+
+  $('main').innerHTML = `
+    <h1>${greeting()}、${esc(me.full_name)}さん</h1>
+    <div class="grid">
+      <section class="card" style="grid-column:1/-1">
+        <div class="toolbar"><h2 class="grow" style="margin:0">📢 お知らせ</h2><a class="btn sm" href="#posts">すべて見る</a></div>
+        <ul class="list">${posts.map(p => postRow(p, readSet)).join('') || '<li class="empty">まだお知らせはありません</li>'}</ul>
+      </section>
+      <section class="card">
+        <h2>🗓 今日のお休み <span class="muted">${fmtDay(t)}</span></h2>
+        <ul class="list">${offOn(t)}</ul>
+        <h2 style="margin-top:14px">明日のお休み <span class="muted">${fmtDay(t1)}</span></h2>
+        <ul class="list">${offOn(t1)}</ul>
+      </section>
+      <section class="card">
+        <h2>📌 2週間の予定</h2>
+        <ul class="list">${events.map(e => `<li class="row" style="cursor:default"><span class="muted" style="width:72px;flex:none">${fmtDay(e.event_date)}</span><div class="main">${esc(e.title)}</div></li>`).join('') || '<li class="empty">予定はありません</li>'}</ul>
+        <p class="muted" style="margin:8px 0 0">予定の追加は<a href="https://s399035u-boop.github.io/yukyu-kanri/" target="_blank" rel="noopener">有給管理</a>のカレンダーから</p>
+      </section>
+      <section class="card">
+        <div class="toolbar"><h2 class="grow" style="margin:0">📘 最近更新されたマニュアル</h2></div>
+        <ul class="list">${pages.map(p => `<li><a class="row" href="#pages/${p.id}"><div class="main"><div class="ttl">${esc(p.title)}</div><div class="muted">${esc(p.category)}・${fmtTime(p.updated_at)} ${esc(nameOf(p.updated_by))}</div></div></a></li>`).join('') || '<li class="empty">なし</li>'}</ul>
+      </section>
+      <section class="card">
+        <div class="toolbar"><h2 class="grow" style="margin:0">🔗 よく使うリンク</h2><a class="btn sm" href="#links">すべて</a></div>
+        <div class="links" style="grid-template-columns:1fr">${links.map(l => `<a class="lk" href="${esc(l.url)}" target="_blank" rel="noopener"><b>${esc(l.title)}</b><span>${esc(l.description || '')}</span></a>`).join('')}</div>
+      </section>
+    </div>`;
+}
+function greeting() {
+  const h = new Date().getHours();
+  return h < 11 ? 'おはようございます' : h < 18 ? 'こんにちは' : 'おつかれさまです';
+}
+
+// ================================================================
+//  お知らせ
+// ================================================================
+async function refreshUnread() {
+  const [posts, reads] = await Promise.all([
+    GET('portal_posts', 'select=id'),
+    GET('portal_reads', 'select=post_id&user_id=eq.' + me.id),
+  ]);
+  const readSet = new Set(reads.map(r => r.post_id));
+  unreadCount = posts.filter(p => !readSet.has(p.id)).length;
+  renderNav((location.hash.slice(1) || 'home').split('/')[0]);
+}
+
+function postRow(p, readSet) {
+  return `<li><a class="row ${readSet.has(p.id) ? '' : 'unread'}" href="#posts/${p.id}">
+    <div class="main"><div class="ttl">${p.pinned ? '<span class="pin">📌</span> ' : ''}${esc(p.title)}</div>
+    <div class="muted">${fmtTime(p.created_at)}・${esc(nameOf(p.author_id))}</div></div>
+    <span class="tag ${esc(p.category)}">${esc(p.category)}</span></a></li>`;
+}
+
+let postFilter = { cat: '', q: '', unreadOnly: false };
+async function viewPosts(id) {
+  const [posts, reads] = await Promise.all([
+    GET('portal_posts', 'select=*&order=pinned.desc,created_at.desc'),
+    GET('portal_reads', 'select=post_id&user_id=eq.' + me.id),
+  ]);
+  const readSet = new Set(reads.map(r => r.post_id));
+  unreadCount = posts.filter(p => !readSet.has(p.id)).length;
+  renderNav('posts');
+
+  const draw = () => {
+    const q = postFilter.q.toLowerCase();
+    const shown = posts.filter(p =>
+      (!postFilter.cat || p.category === postFilter.cat) &&
+      (!postFilter.unreadOnly || !readSet.has(p.id)) &&
+      (!q || (p.title + p.body).toLowerCase().includes(q)));
+    $('post-list').innerHTML = shown.map(p => postRow(p, readSet)).join('') || '<li class="empty">該当するお知らせはありません</li>';
+  };
+
+  $('main').innerHTML = `
+    <h1>📢 お知らせ</h1>
+    <div class="toolbar">
+      <button class="btn accent" onclick="editPost()">＋ 新しいお知らせ</button>
+      <span class="grow"></span>
+      <select id="pf-cat"><option value="">すべての種類</option>${POST_CATS.map(c => `<option ${c === postFilter.cat ? 'selected' : ''}>${c}</option>`).join('')}</select>
+      <label class="muted"><input type="checkbox" id="pf-unread" ${postFilter.unreadOnly ? 'checked' : ''}> 未読のみ</label>
+      <input type="search" id="pf-q" placeholder="検索" value="${esc(postFilter.q)}">
+    </div>
+    <section class="card"><ul class="list" id="post-list"></ul></section>`;
+  $('pf-cat').onchange = e => { postFilter.cat = e.target.value; draw(); };
+  $('pf-unread').onchange = e => { postFilter.unreadOnly = e.target.checked; draw(); };
+  $('pf-q').oninput = e => { postFilter.q = e.target.value; draw(); };
+  draw();
+
+  if (id) openPost(id);
+}
+
+async function openPost(id) {
+  const [[p], reads, comments] = await Promise.all([
+    GET('portal_posts', 'select=*&id=eq.' + id),
+    GET('portal_reads', 'select=user_id,read_at&post_id=eq.' + id + '&order=read_at'),
+    GET('portal_comments', 'select=*&post_id=eq.' + id + '&order=created_at'),
+  ]);
+  if (!p) return toast('このお知らせは削除されています');
+  const iRead = reads.some(r => r.user_id === me.id);
+  const canEdit = p.author_id === me.id || isAdmin();
+  const members = Object.values(people).filter(x => x.active && x.role !== 'viewer');
+  const readIds = new Set(reads.map(r => r.user_id));
+  const notYet = members.filter(x => !readIds.has(x.id));
+
+  openModal(`
+    <div class="muted"><span class="tag ${esc(p.category)}">${esc(p.category)}</span> ${p.pinned ? '<span class="pin">📌 固定</span>' : ''}</div>
+    <h1 style="margin:8px 0 4px">${esc(p.title)}</h1>
+    <div class="muted">${fmtTime(p.created_at)}・${esc(nameOf(p.author_id))}${p.updated_at !== p.created_at ? '（' + fmtTime(p.updated_at) + ' 更新）' : ''}</div>
+    <div class="body" style="margin-top:14px">${md(p.body)}</div>
+    <div class="modal-actions" style="justify-content:flex-start">
+      ${iRead ? '<span class="tag" style="background:#e6f3ec;color:var(--ok)">✓ 既読</span>'
+              : `<button class="btn accent" onclick="markRead('${p.id}')">既読にする</button>`}
+      <span class="grow" style="flex:1"></span>
+      ${canEdit ? `<button class="btn sm" onclick="editPost('${p.id}')">編集</button><button class="btn sm danger" onclick="deletePost('${p.id}')">削除</button>` : ''}
+    </div>
+    <div class="readers" style="margin-top:12px">
+      既読 ${reads.length}人：${reads.map(r => esc(nameOf(r.user_id))).join('、') || '—'}<br>
+      未読 ${notYet.length}人：${notYet.map(x => esc(x.full_name)).join('、') || '—'}
+    </div>
+    <h2 style="margin-top:18px">💬 コメント</h2>
+    ${comments.map(c => `<div class="comment"><div class="muted">${esc(nameOf(c.author_id))}・${fmtTime(c.created_at)}
+      ${c.author_id === me.id || isAdmin() ? `<button class="btn sm" style="float:right" onclick="deleteComment('${c.id}','${p.id}')">削除</button>` : ''}</div>
+      <div class="body">${md(c.body)}</div></div>`).join('') || '<p class="empty">まだコメントはありません</p>'}
+    <textarea id="cm-body" style="min-height:70px;margin-top:8px" placeholder="コメントを書く"></textarea>
+    <div class="modal-actions"><button class="btn primary" onclick="addComment('${p.id}')">コメントする</button></div>`);
+}
+
+async function markRead(id) {
+  try {
+    await db('POST', 'portal_reads', 'on_conflict=post_id,user_id', { post_id: id, user_id: me.id }, 'resolution=ignore-duplicates');
+    await viewPosts(id);
+  } catch (e) { fail(e); }
+}
+
+async function addComment(postId) {
+  const body = $('cm-body').value.trim();
+  if (!body) return;
+  try {
+    await POST('portal_comments', { post_id: postId, body, author_id: me.id });
+    openPost(postId);
+  } catch (e) { fail(e); }
+}
+async function deleteComment(id, postId) {
+  if (!confirm('このコメントを削除しますか？')) return;
+  try { await DEL('portal_comments', 'id=eq.' + id); openPost(postId); } catch (e) { fail(e); }
+}
+
+async function editPost(id) {
+  let p = { title: '', body: '', category: '連絡', pinned: false };
+  if (id) [p] = await GET('portal_posts', 'select=*&id=eq.' + id);
+  openModal(`
+    <h1>${id ? 'お知らせを編集' : '新しいお知らせ'}</h1>
+    <label class="f">タイトル</label><input type="text" id="pe-title" value="${esc(p.title)}">
+    <label class="f">種類</label><select id="pe-cat">${POST_CATS.map(c => `<option ${c === p.category ? 'selected' : ''}>${c}</option>`).join('')}</select>
+    <label class="f">本文 <span class="muted">（## 見出し ／ - 箇条書き ／ **太字** が使えます）</span></label>
+    <textarea id="pe-body">${esc(p.body)}</textarea>
+    <label class="muted" style="display:block;margin-top:8px"><input type="checkbox" id="pe-pin" ${p.pinned ? 'checked' : ''}> 一覧の上に固定する</label>
+    <p class="muted" style="margin:8px 0 0">※ 患者さんの個人情報は書き込まないでください</p>
+    <div class="modal-actions">
+      <button class="btn" onclick="${id ? `openPost('${id}')` : 'closeModal()'}">キャンセル</button>
+      <button class="btn primary" onclick="savePost(${id ? `'${id}'` : ''})">${id ? '保存' : '投稿する'}</button>
+    </div>`);
+  $('pe-title').focus();
+}
+
+async function savePost(id) {
+  const row = {
+    title: $('pe-title').value.trim(), body: $('pe-body').value,
+    category: $('pe-cat').value, pinned: $('pe-pin').checked,
+  };
+  if (!row.title) return toast('タイトルを入力してください');
+  try {
+    if (id) {
+      await PATCH('portal_posts', 'id=eq.' + id, { ...row, updated_at: new Date().toISOString() });
+    } else {
+      [{ id }] = await POST('portal_posts', { ...row, author_id: me.id });
+      await POST('portal_reads', { post_id: id, user_id: me.id });   // 自分の投稿は既読扱い
+    }
+    toast('保存しました');
+    location.hash === '#posts/' + id ? viewPosts(id) : (location.hash = 'posts/' + id);
+  } catch (e) { fail(e); }
+}
+
+async function deletePost(id) {
+  if (!confirm('このお知らせを削除しますか？（コメント・既読記録も消えます）')) return;
+  try { await DEL('portal_posts', 'id=eq.' + id); toast('削除しました'); location.hash = 'posts'; viewPosts(); } catch (e) { fail(e); }
+}
+
+// ================================================================
+//  マニュアル・共有ノート
+// ================================================================
+let pageQ = '';
+async function viewPages(id) {
+  if (id === 'new') return editPage();
+  if (id) return showPage(id);
+
+  const pages = await GET('portal_pages', 'select=id,title,category,body,updated_at,updated_by&order=title');
+  const draw = () => {
+    const q = pageQ.toLowerCase();
+    const shown = pages.filter(p => !q || (p.title + p.body + p.category).toLowerCase().includes(q));
+    const cats = [...PAGE_CATS, ...new Set(shown.map(p => p.category).filter(c => !PAGE_CATS.includes(c)))];
+    $('page-list').innerHTML = cats.map(c => {
+      const ps = shown.filter(p => p.category === c);
+      if (!ps.length) return '';
+      return `<div class="cat-h">${esc(c)}</div><section class="card" style="padding:4px 16px"><ul class="list">${ps.map(p =>
+        `<li><a class="row" href="#pages/${p.id}"><div class="main"><div class="ttl">${esc(p.title)}</div><div class="muted">${fmtTime(p.updated_at)} ${esc(nameOf(p.updated_by))} 更新</div></div></a></li>`).join('')}</ul></section>`;
+    }).join('') || '<p class="empty">該当するページはありません</p>';
+  };
+  $('main').innerHTML = `
+    <h1>📘 マニュアル</h1>
+    <div class="toolbar">
+      <a class="btn accent" href="#pages/new">＋ ページを作る</a>
+      <span class="grow"></span>
+      <input type="search" id="pg-q" placeholder="ルール・手順を検索" value="${esc(pageQ)}">
+    </div>
+    <div id="page-list"></div>`;
+  $('pg-q').oninput = e => { pageQ = e.target.value; draw(); };
+  draw();
+}
+
+async function showPage(id) {
+  const [p] = await GET('portal_pages', 'select=*&id=eq.' + id);
+  if (!p) { $('main').innerHTML = '<div class="card">このページは削除されています。<a href="#pages">一覧へ</a></div>'; return; }
+  const canDelete = p.created_by === me.id || isAdmin();
+  $('main').innerHTML = `
+    <div class="toolbar"><a class="btn sm" href="#pages">← 一覧</a><span class="grow"></span>
+      <button class="btn sm" onclick="editPage('${p.id}')">編集</button>
+      ${canDelete ? `<button class="btn sm danger" onclick="deletePage('${p.id}')">削除</button>` : ''}</div>
+    <article class="card">
+      <span class="tag">${esc(p.category)}</span>
+      <h1 style="margin:8px 0 2px">${esc(p.title)}</h1>
+      <div class="muted">最終更新 ${fmtTime(p.updated_at)}・${esc(nameOf(p.updated_by))}</div>
+      <div class="body" style="margin-top:12px">${md(p.body)}</div>
+    </article>`;
+}
+
+async function editPage(id) {
+  let p = { title: '', category: PAGE_CATS[PAGE_CATS.length - 1], body: '' };
+  if (id) [p] = await GET('portal_pages', 'select=*&id=eq.' + id);
+  const cats = PAGE_CATS.includes(p.category) ? PAGE_CATS : [...PAGE_CATS, p.category];
+  $('main').innerHTML = `
+    <div class="toolbar"><a class="btn sm" href="${id ? '#pages/' + id : '#pages'}">← 戻る</a></div>
+    <section class="card">
+      <h1>${id ? 'ページを編集' : '新しいページ'}</h1>
+      <label class="f">タイトル</label><input type="text" id="pg-title" value="${esc(p.title)}">
+      <label class="f">カテゴリ</label><select id="pg-cat">${cats.map(c => `<option ${c === p.category ? 'selected' : ''}>${esc(c)}</option>`).join('')}</select>
+      <label class="f">本文 <span class="muted">（## 見出し ／ - 箇条書き ／ **太字** が使えます）</span></label>
+      <textarea id="pg-body" style="min-height:360px">${esc(p.body)}</textarea>
+      <p class="muted" style="margin:8px 0 0">※ 患者さんの個人情報は書き込まないでください</p>
+      <div class="modal-actions">
+        <a class="btn" href="${id ? '#pages/' + id : '#pages'}" style="text-decoration:none">キャンセル</a>
+        <button class="btn primary" onclick="savePage(${id ? `'${id}'` : ''})">保存</button>
+      </div>
+    </section>`;
+}
+
+async function savePage(id) {
+  const row = { title: $('pg-title').value.trim(), category: $('pg-cat').value, body: $('pg-body').value, updated_by: me.id, updated_at: new Date().toISOString() };
+  if (!row.title) return toast('タイトルを入力してください');
+  try {
+    if (id) await PATCH('portal_pages', 'id=eq.' + id, row);
+    else [{ id }] = await POST('portal_pages', { ...row, created_by: me.id });
+    toast('保存しました');
+    location.hash = 'pages/' + id;
+  } catch (e) { fail(e); }
+}
+
+async function deletePage(id) {
+  if (!confirm('このページを削除しますか？')) return;
+  try { await DEL('portal_pages', 'id=eq.' + id); toast('削除しました'); location.hash = 'pages'; } catch (e) { fail(e); }
+}
+
+// ================================================================
+//  ファイル共有（Storage）
+// ================================================================
+let fileCat = '';
+async function viewFiles() {
+  const files = await GET('portal_files', 'select=*&order=created_at.desc');
+  const draw = () => {
+    const shown = files.filter(f => !fileCat || f.category === fileCat);
+    $('file-list').innerHTML = shown.map(f => `<li><div class="row" style="cursor:default">
+      <div class="main"><div class="ttl"><a href="#" onclick="downloadFile('${f.id}');return false">${esc(f.name)}</a></div>
+      <div class="muted">${esc(f.category)}・${fmtSize(f.size)}・${fmtTime(f.created_at)} ${esc(nameOf(f.uploaded_by))}${f.note ? '<br>' + esc(f.note) : ''}</div></div>
+      ${f.uploaded_by === me.id || isAdmin() ? `<button class="btn sm danger" onclick="deleteFile('${f.id}')">削除</button>` : ''}
+    </div></li>`).join('') || '<li class="empty">ファイルはありません</li>';
+  };
+  window._files = files;
+  $('main').innerHTML = `
+    <h1>📁 ファイル</h1>
+    <section class="card" style="margin-bottom:16px">
+      <h2>アップロード</h2>
+      <input type="file" id="up-file" multiple>
+      <div class="toolbar" style="margin:10px 0 0">
+        <select id="up-cat">${FILE_CATS.map(c => `<option>${c}</option>`).join('')}</select>
+        <input type="text" id="up-note" placeholder="メモ（任意）" class="grow" style="flex:1;min-width:160px">
+        <button class="btn primary" id="up-btn" onclick="uploadFiles()">アップロード</button>
+      </div>
+      <p class="muted" style="margin:6px 0 0">1ファイル50MBまで。患者さんの個人情報を含むファイルは置かないでください。</p>
+    </section>
+    <div class="toolbar"><span class="grow"></span>
+      <select id="fl-cat"><option value="">すべて</option>${FILE_CATS.map(c => `<option ${c === fileCat ? 'selected' : ''}>${c}</option>`).join('')}</select></div>
+    <section class="card"><ul class="list" id="file-list"></ul></section>`;
+  $('fl-cat').onchange = e => { fileCat = e.target.value; draw(); };
+  draw();
+}
+
+async function uploadFiles() {
+  const list = [...$('up-file').files];
+  if (!list.length) return toast('ファイルを選んでください');
+  const btn = $('up-btn');
+  btn.disabled = true;
+  try {
+    for (const [i, f] of list.entries()) {
+      btn.textContent = `アップロード中… ${i + 1}/${list.length}`;
+      const ext = (f.name.match(/\.[A-Za-z0-9]{1,8}$/) || [''])[0].toLowerCase();
+      const path = `${ymd(new Date()).slice(0, 7)}/${crypto.randomUUID()}${ext}`;   // 日本語名はStorageキーに使わない
+      const res = await api(`${SUPABASE_URL}/storage/v1/object/${BUCKET}/${path}`, {
+        method: 'POST', headers: { 'Content-Type': f.type || 'application/octet-stream' }, body: f,
+      });
+      if (!res.ok) throw new Error((await res.json().catch(() => ({}))).message || 'アップロード失敗 HTTP ' + res.status);
+      await POST('portal_files', { name: f.name, path, size: f.size, mime: f.type, category: $('up-cat').value, note: $('up-note').value.trim() || null, uploaded_by: me.id });
+    }
+    toast('アップロードしました');
+    viewFiles();
+  } catch (e) { fail(e); btn.disabled = false; btn.textContent = 'アップロード'; }
+}
+
+async function downloadFile(id) {
+  const f = window._files.find(x => x.id === id);
+  try {
+    const res = await api(`${SUPABASE_URL}/storage/v1/object/authenticated/${BUCKET}/${f.path}`);
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const url = URL.createObjectURL(await res.blob());
+    const a = document.createElement('a');
+    a.href = url; a.download = f.name;
+    // PDF・画像はダウンロードせずに新しいタブで開く
+    if (/^(application\/pdf|image\/)/.test(f.mime || '')) { a.removeAttribute('download'); a.target = '_blank'; }
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 60000);
+  } catch (e) { fail(e); }
+}
+
+async function deleteFile(id) {
+  const f = window._files.find(x => x.id === id);
+  if (!confirm(`「${f.name}」を削除しますか？`)) return;
+  try {
+    await api(`${SUPABASE_URL}/storage/v1/object/${BUCKET}/${f.path}`, { method: 'DELETE' });
+    await DEL('portal_files', 'id=eq.' + id);
+    toast('削除しました');
+    viewFiles();
+  } catch (e) { fail(e); }
+}
+
+// ================================================================
+//  リンク集
+// ================================================================
+async function viewLinks() {
+  const links = await GET('portal_links', 'select=*&order=sort,created_at');
+  window._links = links;
+  const cats = [...LINK_CATS, ...new Set(links.map(l => l.category).filter(c => !LINK_CATS.includes(c)))];
+  $('main').innerHTML = `
+    <h1>🔗 リンク</h1>
+    <div class="toolbar"><button class="btn accent" onclick="editLink()">＋ リンクを追加</button></div>
+    ${cats.map(c => {
+      const ls = links.filter(l => l.category === c);
+      if (!ls.length) return '';
+      return `<div class="cat-h">${esc(c)}</div><div class="links">${ls.map(l => `
+        <a class="lk" href="${esc(l.url)}" target="_blank" rel="noopener"><b>${esc(l.title)}</b><span>${esc(l.description || '')}</span>
+        ${l.created_by === me.id || isAdmin() ? `<span class="ops"><button onclick="event.preventDefault();editLink('${l.id}')">編集</button><button onclick="event.preventDefault();deleteLink('${l.id}')">削除</button></span>` : ''}
+        </a>`).join('')}</div>`;
+    }).join('') || '<p class="empty">リンクはまだありません</p>'}`;
+}
+
+function editLink(id) {
+  const l = id ? window._links.find(x => x.id === id) : { title: '', url: 'https://', description: '', category: LINK_CATS[0], sort: 100 };
+  openModal(`
+    <h1>${id ? 'リンクを編集' : 'リンクを追加'}</h1>
+    <label class="f">名前</label><input type="text" id="lk-title" value="${esc(l.title)}">
+    <label class="f">URL</label><input type="url" id="lk-url" value="${esc(l.url)}">
+    <label class="f">説明（任意）</label><input type="text" id="lk-desc" value="${esc(l.description || '')}">
+    <label class="f">分類</label><select id="lk-cat">${LINK_CATS.map(c => `<option ${c === l.category ? 'selected' : ''}>${c}</option>`).join('')}</select>
+    <label class="f">並び順（小さいほど上）</label><input type="text" id="lk-sort" inputmode="numeric" value="${l.sort}">
+    <div class="modal-actions"><button class="btn" onclick="closeModal()">キャンセル</button>
+      <button class="btn primary" onclick="saveLink(${id ? `'${id}'` : ''})">保存</button></div>`);
+}
+
+async function saveLink(id) {
+  const row = {
+    title: $('lk-title').value.trim(), url: $('lk-url').value.trim(),
+    description: $('lk-desc').value.trim() || null, category: $('lk-cat').value,
+    sort: parseInt($('lk-sort').value, 10) || 100,
+  };
+  if (!row.title || !/^https?:\/\//.test(row.url)) return toast('名前と URL（https://〜）を入力してください');
+  try {
+    if (id) await PATCH('portal_links', 'id=eq.' + id, row);
+    else await POST('portal_links', { ...row, created_by: me.id });
+    closeModal(); viewLinks();
+  } catch (e) { fail(e); }
+}
+
+async function deleteLink(id) {
+  if (!confirm('このリンクを削除しますか？')) return;
+  try { await DEL('portal_links', 'id=eq.' + id); viewLinks(); } catch (e) { fail(e); }
+}
+
+boot();
+</script>
+</body>
+</html>
