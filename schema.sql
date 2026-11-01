@@ -192,7 +192,6 @@ insert into public.portal_links (title, url, description, category, sort, create
 select v.title, v.url, v.description, v.category, v.sort,
        (select id from public.profiles where email = 's399035u@gmail.com')
 from (values
-  ('有給管理', 'https://s399035u-boop.github.io/yukyu-kanri/', '休暇の取得・残日数・共有カレンダー（同じアカウントでログイン）', '院内アプリ', 10),
   ('来院前Web問診（患者用）', 'https://s399035u-boop.github.io/web-monshin/', '患者さんに案内するURL', '院内アプリ', 20),
   ('Web問診（医師用）', 'https://s399035u-boop.github.io/web-monshin/#doctor', '問診サマリーの確認（パスコードが必要）', '院内アプリ', 30),
   ('唐人町ハートクリニック（開院予告）', 'https://tojinmachi-heart.com', '2027年4月開院予定', '外部サイト', 120)
@@ -205,7 +204,7 @@ from (values
   ('RULE-1 遅刻時の連絡', '勤怠・休暇',
    E'## 結論\n遅刻する場合は、**始業時刻より前に院長へLINEで連絡**する。院長が不在のときは**理事長へ連絡**する。\n\n## 詳細・手順\n- 遅刻がわかった時点で、始業前に院長へ連絡する\n- 連絡手段：LINE\n\n## 例外・注意点\n- 院長が不在のときは、理事長へ連絡する\n\n## 改定履歴\n- 2026-10-15 制定\n- 2026-10-16 連絡手段（LINE）と院長不在時の連絡先（理事長）を追記'),
   ('このポータルの使い方', 'はじめに',
-   E'## できること\n- **お知らせ**：連絡事項の掲示。読んだら「既読にする」を押す。コメントもできる\n- **マニュアル**：院内ルール・手順書。誰でも追加・編集できる\n- **ファイル**：PDF・Excel・画像などの共有\n- **リンク**：有給管理などよく使うページへの入口\n\n## 注意\n- 患者さんの氏名・カルテ情報など個人情報は書き込まない\n- パスワードは有給管理と同じ')
+   E'## できること\n- **お知らせ**：連絡事項の掲示。読んだら「既読にする」を押す。コメントもできる\n- **マニュアル**：院内ルール・手順書。誰でも追加・編集できる\n- **ファイル**：PDF・Excel・画像などの共有\n- **リンク**：よく使うページへの入口\n\n## 注意\n- 患者さんの氏名・カルテ情報など個人情報は書き込まない\n- パスワードは有給管理と同じ')
 ) as v(title, category, body)
 cross join (select id from public.profiles where email = 's399035u@gmail.com') a
 where not exists (select 1 from public.portal_pages);
